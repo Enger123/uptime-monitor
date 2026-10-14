@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from app.models.monitor_check import MonitorCheck
-from datetime import datetime
+from datetime import datetime, timezone
 
 class MonitorCheckRepository:
     def __init__(self, db: Session):
@@ -16,9 +16,9 @@ class MonitorCheckRepository:
     ):
         new_monitor_check = MonitorCheck(
             monitor_id=monitor_id,
-            checked_at=datetime.now(),
+            checked_at=datetime.now(timezone.utc),
             status_code=status_code,
-            response_time_ms=f"{response_time_ms} ms",
+            response_time_ms=response_time_ms,
             is_success=is_success,
             error_message=error_message
         )

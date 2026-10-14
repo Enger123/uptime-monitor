@@ -16,15 +16,26 @@ class MonitorCheckService:
         if not monitor:
             raise HTTPException(status_code=404, detail='Monitor not found')
         start = time.perf_counter()
-        response = httpx.get(monitor.url)
-        elapsed = time.perf_counter() - start
+        try:
+            response = httpx.get(monitor.url, timeout=0.05)
+            elapsed = (time.perf_counter() - start) * 1000
+            status_code = response.status_code
+            is_success = response.is_success
+            error_message = None
+
+        except httpx.RequestError as e:
+            elapsed = (time.perf_counter() - start) * 1000
+            status_code = None
+            is_success = False
+            error_message = f"{e}"
+            
         new_monitor_check = self.monitor_check_repository.create_monitor_check(
             monitor_id=monitor_id,
-            status_code=response.status_code,
+            status_code=status_code,
             response_time_ms=elapsed,
-            is_success=True,
-            error_message=None
-        )
+            is_success=is_success,
+            error_message=error_message
+        )            
         self.db.commit()
         self.db.refresh(new_monitor_check)
         return MonitorChecksResponse.model_validate(new_monitor_check)

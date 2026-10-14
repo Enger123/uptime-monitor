@@ -8,10 +8,10 @@ class MonitorCheck(Base):
 
     monitor_id: Mapped[int] = mapped_column(ForeignKey('monitors.id'))
     checked_at: Mapped[datetime]
-    status_code: Mapped[int]
-    response_time_ms: Mapped[str]
+    status_code: Mapped[int | None] = mapped_column(nullable=True)
+    response_time_ms: Mapped[float]
     is_success: Mapped[bool]
-    error_message: Mapped[str] = mapped_column(nullable=True)
+    error_message: Mapped[str | None] = mapped_column(nullable=True)
     monitor: Mapped['Monitor'] = relationship(back_populates='monitor_checks')
 
     def __repr__(self):
