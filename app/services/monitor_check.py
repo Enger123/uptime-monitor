@@ -11,13 +11,13 @@ class MonitorCheckService:
         self.monitor_check_repository = MonitorCheckRepository(db)
         self.monitor_repository = MonitorRepository(db)
 
-    def check_monitor(self, monitor_id: int):
+    def check_monitor(self, monitor_id: int) -> MonitorChecksResponse:
         monitor = self.monitor_repository.get_monitor(monitor_id)
         if not monitor:
             raise HTTPException(status_code=404, detail='Monitor not found')
         start = time.perf_counter()
         try:
-            response = httpx.get(monitor.url, timeout=0.05)
+            response = httpx.get(monitor.url, timeout=5)
             elapsed = (time.perf_counter() - start) * 1000
             status_code = response.status_code
             is_success = response.is_success
@@ -39,3 +39,15 @@ class MonitorCheckService:
         self.db.commit()
         self.db.refresh(new_monitor_check)
         return MonitorChecksResponse.model_validate(new_monitor_check)
+
+    def list_checks_monitor(self, monitor_id: int, limit: int) -> list[MonitorChecksResponse]:
+        monitor = self.monitor_repository.get_monitor(monitor_id)
+        if not monitor:
+            raise HTTPException(status_code=404, detail='Monitor not found')
+        if limit < 0:
+            raise HTTPException(status_code=409, detail='Limit can not be negative')
+        monitor_checks = self.monitor_check_repository.list_checks_monitor(
+            monitor_id, limit
+        )
+        return [MonitorChecksResponse.model_validate(check)
+            for check in monitor_checks]

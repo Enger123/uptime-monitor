@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from app.models.monitor_check import MonitorCheck
 from datetime import datetime, timezone
+from sqlalchemy import select
 
 class MonitorCheckRepository:
     def __init__(self, db: Session):
@@ -24,3 +25,11 @@ class MonitorCheckRepository:
         )
         self.db.add(new_monitor_check)
         return new_monitor_check
+
+    def list_checks_monitor(self, monitor_id: int, limit: int):
+        return self.db.scalars(
+            select(MonitorCheck)
+            .where(MonitorCheck.monitor_id==monitor_id)
+            .order_by(MonitorCheck.checked_at.desc())
+            .limit(limit)
+            ).all()

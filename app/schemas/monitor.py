@@ -12,7 +12,7 @@ class MonitorResponse(BaseModel):
 
 class MonitorUpdateSchema(BaseModel):
     name: str | None = None
-    url: str | None = None
+    url: HttpUrl | None = None
 
 
     

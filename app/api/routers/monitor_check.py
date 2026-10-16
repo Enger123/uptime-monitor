@@ -8,3 +8,11 @@ router = APIRouter()
 @router.post("/monitors/{monitor_id}/checks")
 def check_monitor(monitor_id: int, monitor_service: MonitorCheckServiceDep):
     return monitor_service.check_monitor(monitor_id)
+
+@router.get("/monitors/{monitor_id}/checks")
+def list_checks_monitor(
+    monitor_id: int,
+    monitor_service: MonitorCheckServiceDep,
+    limit: int = 10
+    ):
+    return monitor_service.list_checks_monitor(monitor_id, limit)

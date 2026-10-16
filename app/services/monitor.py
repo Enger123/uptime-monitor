@@ -36,7 +36,7 @@ class MonitorService:
         if new_monitor.name is not None:
             monitor.name = new_monitor.name
         if new_monitor.url is not None:
-            monitor.url = new_monitor.url
+            monitor.url = str(new_monitor.url)
         self.db.commit()
         self.db.refresh(monitor)
         return MonitorResponse.model_validate(monitor)
